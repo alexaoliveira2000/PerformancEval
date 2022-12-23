@@ -231,10 +231,15 @@ let salaryChart = function (employee) {
             scales: {
                 y: {
                     ticks: {
-                        callback: function(value, index, ticks) {
+                        callback: function (value, index, ticks) {
                             return value + ' €';
                         }
                     }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
                 }
             }
         }
@@ -270,14 +275,23 @@ let performanceChart = function (employee) {
                 y: {
                     beginAtZero: true,
                     ticks: {
-                        callback: function(value, index, ticks) {
+                        callback: function (value, index, ticks) {
                             if (Number.isInteger(value))
                                 return valueToPerformance(value);
                         }
                     },
                     max: 5
                 }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
             }
         }
     });
+}
+
+let getSemester = function (date) {
+    return date.getMonth() < 6 ? "1º Semestre" : "2º Semestre";
 }

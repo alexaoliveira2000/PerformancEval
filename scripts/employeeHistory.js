@@ -86,51 +86,180 @@ var loadEmployeeHistoryPage = function (id) {
         </div>
     </footer>
 </div>
-    `
+    `;
+
+    [...employee.history].reverse().forEach(function (history, index) {
+        evaluationChart(history, index);
+    });
 }
 
 let buildEvaluationCards = function(employee) {
     let cards = "";
-    [...employee.history].reverse().forEach(function (history) {
-        cards += buildEvaluationCard(history);
+
+    let employeeHistory = [...employee.history].reverse();
+
+    employeeHistory.forEach(function (history, index) {
+        cards += buildEvaluationCard(history, index);
     });
+
     return cards;
 }
 
-let buildEvaluationCard = function(history) {
-    let evaluator = employees.filter(e => e.id === history.evaluatorEmployeeId)[0];
+let buildEvaluationCard = function(evaluation, index) {
+    let evaluator = employees.filter(e => e.id === evaluation.evaluatorEmployeeId)[0];
     let card = `
     <div class="card shadow">
                 <div class="card-header py-3">
-                    <p class="text-primary m-0 fw-bold">${history.year}</p>
+                    <p class="text-primary m-0 fw-bold">${getSemester(evaluation.date) + " " + evaluation.date.getFullYear()}</p>
                 </div>
                 <div class="card-body">
-                    <div class="table-responsive table mt-2" id="dataTable" role="grid" aria-describedby="dataTable_info">
-                        <table class="table my-0" id="dataTable">
-                            <thead>
-                                <tr>
-                                    <th>Pergunta 1</th>
-                                    <th>Pergunta 2</th>
-                                    <th>Pergunta 3</th>
-                                    <th>Pergunta 4</th>
-                                    <th>Pergunta 5</th>
-                                    <th>Resultado</th>
-                                </tr>
-                            </thead>
-                                <tr>
-                                    <td>3</td>
-                                    <td>3</td>
-                                    <td>5</td>
-                                    <td>4</td>
-                                    <td>3</td>
-                                    <td>On Target</td>
-                                </tr>
-                        </table>
-                    </div>
+                            
+                <div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <div style="height: 240px">
+                <canvas id="evaluationChart${index}" style="display: block;">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Traços</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Habilidade</td>
+                            <td>${evaluation.traits.knowhow}</td>
+                        </tr>
+                        <tr>
+                            <td>Pontualidade</td>
+                            <td>${evaluation.traits.punctuality}</td>
+                        </tr>
+                        <tr>
+                            <td>Assiduidade</td>
+                            <td>${evaluation.traits.assiduity}</td>
+                        </tr>
+                        <tr>
+                            <td>Apresentação</td>
+                            <td>${evaluation.traits.appearence}</td>
+                        </tr>
+                        <tr>
+                            <td>Honestidade</td>
+                            <td>${evaluation.traits.honesty}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Comportamento</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Iniciativa</td>
+                            <td>${evaluation.behaviour.initiative}</td>
+                        </tr>
+                        <tr>
+                            <td>Cooperação</td>
+                            <td>${evaluation.behaviour.cooperation}</td>
+                        </tr>
+                        <tr>
+                            <td>Responsabilidade</td>
+                            <td>${evaluation.behaviour.responsability}</td>
+                        </tr>
+                        <tr>
+                            <td>Liderança</td>
+                            <td>${evaluation.behaviour.leadership}</td>
+                        </tr>
+                        <tr>
+                            <td>Criatividade</td>
+                            <td>${evaluation.behaviour.criativity}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Resultados</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Quantidade</td>
+                            <td>${evaluation.results.quantity}</td>
+                        </tr>
+                        <tr>
+                            <td>Qualidade</td>
+                            <td>${evaluation.results.quality}</td>
+                        </tr>
+                        <tr>
+                            <td>Prazos</td>
+                            <td>${evaluation.results.deadlines}</td>
+                        </tr>
+                        <tr>
+                            <td>Acidentes</td>
+                            <td>${evaluation.results.accidents}</td>
+                        </tr>
+                        <tr>
+                            <td>Foco</td>
+                            <td>${evaluation.results.focus}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
                     <p> Comentários: Nada a apontar. </p>
                 </div>
             </div>
         <p>Avaliador: <button class="button-text" onClick="loadProfilePage(${evaluator.id})">${evaluator.name}</button></p>
     `
     return card;
+}
+
+
+let evaluationChart = function (evaluation, index) {
+
+    let traitsSum = 0;
+    let behaviourSum = 0;
+    let resultsSum = 0;
+
+    for (value in evaluation.traits) traitsSum += evaluation.traits[value];
+    for (value in evaluation.behaviour) behaviourSum += evaluation.behaviour[value];
+    for (value in evaluation.results) resultsSum += evaluation.results[value];
+
+    const evalChart = document.getElementById('evaluationChart' + index);
+    new Chart(evalChart, {
+        type: 'pie',
+        data: {
+            labels: ["Traços", "Comportamento", "Resultados"],
+            datasets: [{
+                label: 'Avaliação',
+                data: [traitsSum, behaviourSum, resultsSum],
+                borderWidth: 1
+            }],
+            hoverOffset: 4
+        }
+    });
+
+    return evalChart;
+
 }
