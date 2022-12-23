@@ -122,14 +122,16 @@ let buildEmployeesTable = function () {
     employees.forEach(function (employee) {
         let lastHistory = employee.history[employee.history.length - 1];
         let age = getAge(employee.birthDate);
+        let sinceYear = employee.history.filter(evaluation => evaluation.role === lastHistory.role)[0].date.getFullYear();
+
         let employeeInfo = `
         <tr>
             <td><button class="button-text" onClick="loadProfilePage(${employee.id})">${employee.name}</button></td>
             <td>${lastHistory.role}</td>
             <td>${employee.department}</td>
             <td>${age}</td>
-            <td>${lastHistory.year}<br></td>
-            <td>${lastHistory.salary + " €"}</td>
+            <td>${sinceYear}<br></td>
+            <td>${lastHistory.newSalary + " €"}</td>
         </tr>
         `
         table += employeeInfo;

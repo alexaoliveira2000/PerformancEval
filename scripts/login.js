@@ -13,7 +13,7 @@ var loadLoginPage = function() {
                         <div class="card-body p-0">
                             <div class="p-5">
                                 <div class="text-center">
-                                    <h4 class="text-dark mb-4">PerformancEval</h4>
+                                    <h3 class="text-dark mb-4">PerformancEval</h3>
                                 </div>
                                 <form class="user">
                                     <div class="mb-3"><input class="form-control form-control-user" type="username"
@@ -22,7 +22,6 @@ var loadLoginPage = function() {
                                             id="password" placeholder="Password" name="password"></div>
                                     <button id="loginButton" class="btn btn-primary d-block btn-user w-100"
                                         type="button">Login</button>
-                                    <hr>
                                     <hr>
                                 </form>
                             </div>

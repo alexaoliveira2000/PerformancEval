@@ -108,7 +108,7 @@ var loadProfilePage = function (id) {
                                                 </div>
                                                 <div class="row">
                                                     <div class="col">
-                                                        <div class="mb-3"><label class="form-label" for="first_name"><strong>Salário</strong></label><strong class="d-xl-flex align-items-xl-center" style="color: rgb(0,0,0);">${lastHistory.salary + " €"}</strong></div>
+                                                        <div class="mb-3"><label class="form-label" for="first_name"><strong>Salário</strong></label><strong class="d-xl-flex align-items-xl-center" style="color: rgb(0,0,0);">${lastHistory.newSalary + " €"}</strong></div>
                                                     </div>
                                                     <div class="col">
                                                         <div class="mb-3"><label class="form-label" for="last_name"><strong>Username</strong></label><strong class="d-xl-flex align-items-xl-center" style="color: rgb(0,0,0);">${employee.username}</strong></div>
@@ -207,12 +207,12 @@ function format(inputDate) {
 let salaryChart = function (employee) {
 
     let chartLabels = [];
-    employee.history.forEach(function (h) {
-        chartLabels.push(String(h.year));
+    employee.history.forEach(function (evaluation) {
+        chartLabels.push(String(evaluation.date.getFullYear()));
     });
     let chartData = [];
-    employee.history.forEach(function (h) {
-        chartData.push(h.salary);
+    employee.history.forEach(function (evaluation) {
+        chartData.push(evaluation.newSalary);
     });
 
     const salaryChart = document.getElementById('salaryChart');
@@ -245,12 +245,12 @@ let salaryChart = function (employee) {
 let performanceChart = function (employee) {
 
     let chartLabels = [];
-    employee.history.forEach(function (h) {
-        chartLabels.push(String(h.year));
+    employee.history.forEach(function (evaluation) {
+        chartLabels.push(String(evaluation.date.getFullYear()));
     });
     let chartData = [];
     employee.history.forEach(function (h) {
-        chartData.push(performanceToValue(h.performance));
+        chartData.push(performanceToValue(h.calculatedGrade));
     });
 
     const performanceChart = document.getElementById('performanceChart');
@@ -280,26 +280,4 @@ let performanceChart = function (employee) {
             }
         }
     });
-}
-
-let performanceToValue = function(performance) {
-    switch(performance) {
-        case "Below Target": return 0;
-        case "Mostly on Target": return 1;
-        case "On Target": return 2;
-        case "Above Target": return 3;
-        case "High Performance": return 4;
-        default: return 5;
-    }
-}
-
-let valueToPerformance = function(value) {
-    switch(value) {
-        case 0: return "Below Target";
-        case 1: return "Mostly on Target";
-        case 2: return "On Target";
-        case 3: return "Above Target";
-        case 4: return "High Performance";
-        default: return "Exceptional Performance";
-    }
 }
