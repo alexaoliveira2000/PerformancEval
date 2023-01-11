@@ -75,7 +75,7 @@ var loadEmployeeHistoryPage = function (id) {
         </nav>
         <div class="container-fluid">
             <div class="d-sm-flex justify-content-between align-items-center mb-4">
-                <h3 class="text-dark mb-0">Histórico de Avaliações</h3>
+                <h3 class="text-dark mb-0">Histórico de Avaliações - ${employee.name}</h3>
                 <a class="btn btn-primary btn-sm d-none d-sm-inline-block" role="button" onClick="loadProfilePage(${employee.id})">Voltar ao Perfil</a>
             </div>
             ${buildEvaluationCards(employee)}
@@ -95,10 +95,27 @@ var loadEmployeeHistoryPage = function (id) {
 }
 
 let buildEvaluationCards = function(employee) {
-    let cards = "";
+
+    let today = new Date();
+    let newEvaluationDate = new Date(today.setMonth(today.getMonth() + 6));
+    let evaluator = employees.filter(e => e.canEvaluate && e.department === employee.department)[0];
+
+    let cards = `
+        <div class="card shadow">
+            <div class="card-header py-3" style="height: 50px">
+                <div class="d-sm-flex justify-content-between align-items-center mb-4">
+                    <div><p class="text-primary m-0 fw-bold">${getSemester(newEvaluationDate) + " " +newEvaluationDate.getFullYear()}</p></div>
+                    <div><strong>Avaliado por: <button class="button-text" onClick="loadProfilePage(${evaluator.id})">${evaluator.name}</button></strong></div>
+                </div>
+            </div>
+            <div class="card-body">
+                <i>Próxima Avaliação</i>
+            </div>
+        </div>
+        <hr />
+    `;
 
     let employeeHistory = [...employee.history].reverse();
-
     employeeHistory.forEach(function (history, index) {
         cards += buildEvaluationCard(history, index);
     });
@@ -110,8 +127,11 @@ let buildEvaluationCard = function(evaluation, index) {
     let evaluator = employees.filter(e => e.id === evaluation.evaluatorEmployeeId)[0];
     let card = `
     <div class="card shadow">
-                <div class="card-header py-3">
-                    <p class="text-primary m-0 fw-bold">${getSemester(evaluation.date) + " " + evaluation.date.getFullYear()}</p>
+                <div class="card-header py-3" style="height: 50px">
+                    <div class="d-sm-flex justify-content-between align-items-center mb-4">
+                        <div><p class="text-primary m-0 fw-bold">${getSemester(evaluation.date) + " " + evaluation.date.getFullYear()}</p></div>
+                        <div><strong>Avaliado por: <button class="button-text" onClick="loadProfilePage(${evaluator.id})">${evaluator.name}</button></strong></div>
+                    </div>
                 </div>
                 <div class="card-body">
                             
@@ -226,12 +246,13 @@ let buildEvaluationCard = function(evaluation, index) {
         </div>
     </div>
 </div>
-
-
-                    <p> Comentários: Nada a apontar. </p>
+                    <div style="color: black">Comentários:</div>
+                    <i>${evaluation.comments}</i>
+                    <p></p>
+                    <p style="color: black"> Avaliação Final: <b>${evaluation.calculatedGrade}</b> </p>
                 </div>
             </div>
-        <p>Avaliador: <button class="button-text" onClick="loadProfilePage(${evaluator.id})">${evaluator.name}</button></p>
+        <hr />
     `
     return card;
 }
@@ -255,7 +276,12 @@ let evaluationChart = function (evaluation, index) {
             datasets: [{
                 label: 'Avaliação',
                 data: [traitsSum, behaviourSum, resultsSum],
-                borderWidth: 1
+                borderWidth: 1,
+                backgroundColor: [
+                    '#00008B',
+                    '#1F75FE',
+                    '#74BBFB'
+                  ]
             }],
             hoverOffset: 4
         }

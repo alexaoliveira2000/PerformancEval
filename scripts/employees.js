@@ -71,11 +71,49 @@ var loadEmployeesPage = function () {
                         </ul>
                     </div>
                 </nav>
+
+
+
+
+
                 <div class="container-fluid">
                     <h3 class="text-dark mb-4">Colaboradores</h3>
+
                     <div class="card shadow">
-                        <div class="card-header py-3">
-                            <p class="text-primary m-0 fw-bold">Informação dos Colaboradores</p>
+                        <div class="card-header py-3" style="height: 55px;">
+                                    <div class="d-sm-flex justify-content-between align-items-center mb-4" style="height: 30px;">
+                                        <div class="d-inline-flex float-start align-items-center" style="height: 100%;">
+                                            <p class="text-primary m-0 fw-bold justify-content-start align-items-center">Meu Departamento</p>
+                                        </div>
+                                    </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive table mt-2" id="dataTable" role="grid" aria-describedby="dataTable_info">
+                                <table class="table my-0" id="dataTable">
+                                    ${buildEmployeesTable(authenticatedEmployee.department)}
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="card shadow">
+                        <div class="card-header py-3" style="height: 55px;">
+                                    <div class="d-sm-flex justify-content-between align-items-center mb-4" style="height: 30px;">
+                                        <div class="d-inline-flex float-start align-items-center" style="height: 100%;">
+                                            <p class="text-primary m-0 fw-bold justify-content-start align-items-center">Todos os Colaboradores</p>
+                                        </div>
+                                        <div class="d-inline-flex float-end" style="height: 100%;">
+                                            <h6 class="d-flex float-start d-sm-flex d-xl-flex justify-content-start align-items-center align-items-sm-center justify-content-xl-center align-items-xl-center" style="height: 30px;">Sort by:</h6>
+                                            <div class="dropdown float-end" style="height: 100%;">
+                                            <button class="btn btn-primary dropdown-toggle d-flex d-sm-flex d-xl-flex align-items-center align-items-sm-center align-items-xl-center" aria-expanded="false" data-bs-toggle="dropdown" type="button" style="background: rgba(13,110,253,0);color: rgb(0,0,0);height: 30px;border-style: none;font-weight: bold;">Salary</button>
+                                                <div class="dropdown-menu">
+                                                    <a class="dropdown-item" href="#">First Item</a>
+                                                    <a class="dropdown-item" href="#">Second Item</a>
+                                                    <a class="dropdown-item" href="#">Third Item</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive table mt-2" id="dataTable" role="grid" aria-describedby="dataTable_info">
@@ -85,6 +123,9 @@ var loadEmployeesPage = function () {
                             </div>
                         </div>
                     </div>
+                    
+
+
                 </div>
             </div>
             <footer class="bg-white sticky-footer">
@@ -106,13 +147,13 @@ function getAge(birthDate) {
     return age;
 }
 
-let buildEmployeesTable = function () {
+let buildEmployeesTable = function (department) {
     let table = "";
     table = `
     <thead>
         <tr>
             <th>Nome</th>
-            <th>Cargo</th>
+            <th>Posição</th>
             <th>Departamento</th>
             <th>Idade</th>
             <th>Desde</th>
@@ -121,22 +162,35 @@ let buildEmployeesTable = function () {
     </thead>
     `
     employees.forEach(function (employee) {
-        let lastHistory = employee.history[employee.history.length - 1];
-        let age = getAge(employee.birthDate);
-        let sinceYear = employee.history.filter(evaluation => evaluation.role === lastHistory.role)[0].date.getFullYear();
+        if (department == null || employee.department === department) {
+            let lastHistory = employee.history[employee.history.length - 1];
+            let age = getAge(employee.birthDate);
+            let sinceYear = employee.history.filter(evaluation => evaluation.role === lastHistory.role)[0].date.getFullYear();
 
-        let employeeInfo = `
-        <tr>
+            if (employee.canEvaluate) {
+                table += `
+            <tr>
+                <td><button class="button-text" onClick="loadProfilePage(${employee.id})">${employee.name}</button><i style="margin-left: 10px" class="fas fa-star"></i></td>
+                <td>${lastHistory.role}</td>
+                <td>${employee.department}</td>
+                <td>${age}</td>
+                <td>${sinceYear}<br></td>
+                <td>${lastHistory.newSalary + " €"}</td>
+            </tr>
+            `;
+            } else {
+                table += `
+            <tr>
             <td><button class="button-text" onClick="loadProfilePage(${employee.id})">${employee.name}</button></td>
             <td>${lastHistory.role}</td>
             <td>${employee.department}</td>
             <td>${age}</td>
             <td>${sinceYear}<br></td>
             <td>${lastHistory.newSalary + " €"}</td>
-        </tr>
-        `
-        table += employeeInfo;
-        ;
+            </tr>
+            `;
+            }
+        }
     });
     return table;
 }

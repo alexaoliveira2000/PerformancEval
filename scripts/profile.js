@@ -79,16 +79,19 @@ var loadProfilePage = function (id) {
         <div class="container-fluid">
                         <div class="d-sm-flex justify-content-between align-items-center mb-4">
                             <h3 class="text-dark mb-0">Perfil</h3>
-                            <a class="btn btn-primary btn-sm d-none d-sm-inline-block" role="button" onClick="loadEmployeeHistoryPage(${employee.id})">Histórico de Avaliações</a>
+                            <div>
+                                <a id="evaluateButton" class="btn btn-primary btn-sm d-none d-sm-inline-block" role="button" onClick="loadPendingEvaluationsPage(${employee.id})" style="margin-right: 10px;background: rgb(140,179,91);border-color: rgb(140,179,91); visibility: hidden">Avaliar</button>
+                                <a class="btn btn-primary btn-sm d-none d-sm-inline-block" role="button" onClick="loadEmployeeHistoryPage(${employee.id})">Histórico de Avaliações</a>
+                            </div>
                         </div>
                     <div class="row mb-3">
                         <div class="col">
                             <div class="row">
                                 <div class="col">
                                     <div class="card shadow d-xl-flex mb-3">
-                                        <div class="card-header py-3">
-                                            <p class="text-primary m-0 fw-bold">Informação do Colaborador</p>
-                                        </div>
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h6 class="text-primary fw-bold m-0">Informação do Colaborador</h6>
+                                    </div>
                                         <div class="card-body">
                                             <form>
                                                 <div class="row">
@@ -101,7 +104,7 @@ var loadProfilePage = function (id) {
                                                 </div>
                                                 <div class="row">
                                                     <div class="col">
-                                                        <div class="mb-3"><label class="form-label" for="username"><strong>Cargo</strong></label><strong class="d-xl-flex align-items-xl-center" style="color: rgb(0,0,0);">${lastHistory.role}</strong></div>
+                                                        <div class="mb-3"><label class="form-label" for="username"><strong>Posição</strong></label><strong class="d-xl-flex align-items-xl-center" style="color: rgb(0,0,0);">${lastHistory.role}</strong></div>
                                                     </div>
                                                     <div class="col">
                                                         <div class="mb-3"><label class="form-label" for="email"><strong>Departamento</strong></label><strong class="d-xl-flex align-items-xl-center" style="color: rgb(0,0,0);">${employee.department}</strong></div>
@@ -112,13 +115,31 @@ var loadProfilePage = function (id) {
                                                         <div class="mb-3"><label class="form-label" for="first_name"><strong>Salário</strong></label><strong class="d-xl-flex align-items-xl-center" style="color: rgb(0,0,0);">${lastHistory.newSalary + " €"}</strong></div>
                                                     </div>
                                                     <div class="col">
-                                                        <div class="mb-3"><label class="form-label" for="last_name"><strong>Username</strong></label><strong class="d-xl-flex align-items-xl-center" style="color: rgb(0,0,0);">${employee.username}</strong></div>
+                                                        <div class="mb-3"><label class="form-label" for="last_name"><strong>Contratado em</strong></label><strong class="d-xl-flex align-items-xl-center" style="color: rgb(0,0,0);">${format(employee.hiredDate)}</strong></div>
                                                     </div>
                                                 </div>
                                             </form>
                                         </div>
                                     </div>
                                 </div>
+
+                                <div class="col-xl-6">
+                                    <div class="card shadow d-xl-flex mb-3">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h6 class="text-primary fw-bold m-0">Histórico</h6>
+                                    </div>
+                                        <div class="card-body">
+                                            <div id="dataTable-1" class="table-responsive table mt-2" role="grid" aria-describedby="dataTable_info">
+                                                <table id="dataTable" class="table my-0">
+                                                    ${rolesTable(employee)}
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
                             </div>
                             <div class="row mb-3 d-none">
                                 <div class="col">
@@ -185,6 +206,7 @@ var loadProfilePage = function (id) {
 
     salaryChart(employee);
     performanceChart(employee);
+    showEvaluateButton(employee);
 }
 
 function format(inputDate) {
@@ -209,7 +231,7 @@ let salaryChart = function (employee) {
 
     let chartLabels = [];
     employee.history.forEach(function (evaluation) {
-        chartLabels.push(String(evaluation.date.getFullYear()));
+        chartLabels.push(String(getShortSemester(evaluation.date) + " " + evaluation.date.getFullYear()));
     });
     let chartData = [];
     employee.history.forEach(function (evaluation) {
@@ -224,7 +246,8 @@ let salaryChart = function (employee) {
             datasets: [{
                 label: 'Salário',
                 data: chartData,
-                borderWidth: 1
+                borderWidth: 2,
+                borderColor: 'rgb(54,93,205)'
             }]
         },
         options: {
@@ -252,7 +275,7 @@ let performanceChart = function (employee) {
 
     let chartLabels = [];
     employee.history.forEach(function (evaluation) {
-        chartLabels.push(String(evaluation.date.getFullYear()));
+        chartLabels.push(String(getShortSemester(evaluation.date) + " " + evaluation.date.getFullYear()));
     });
     let chartData = [];
     employee.history.forEach(function (h) {
@@ -267,7 +290,8 @@ let performanceChart = function (employee) {
             datasets: [{
                 label: 'Performance',
                 data: chartData,
-                borderWidth: 1
+                borderWidth: 2,
+                borderColor: 'rgb(54,93,205)'
             }]
         },
         options: {
@@ -295,4 +319,65 @@ let performanceChart = function (employee) {
 
 let getSemester = function (date) {
     return date.getMonth() < 6 ? "1º Semestre" : "2º Semestre";
+}
+
+let getShortSemester = function (date) {
+    return date.getMonth() < 6 ? "1º Sem" : "2º Sem";
+}
+
+let showEvaluateButton = function(employee) {
+
+    if (authenticatedEmployee === employee) return;
+    if (!authenticatedEmployee.canEvaluate) return;
+    if (authenticatedEmployee.department !== employee.department) return;
+
+    let today = new Date();
+    let lastEvaluation = employee.history[employee.history.length - 1];
+
+    if (lastEvaluation.date.getFullYear() === today.getFullYear() && getSemester(lastEvaluation.date) === getSemester(today)) return;
+
+    let evaluateButton = document.getElementById("evaluateButton");
+    evaluateButton.style.visibility = "visible";
+
+}
+
+let rolesTable = function(employee) {
+    let table = `
+    <thead>
+        <tr>
+            <th>Posição</th>
+            <th>Desde</th>
+            <th>Até</th>
+        </tr>
+    </thead>
+    <tbody>
+    `
+
+    let role = employee.history[0].role;
+    let since = employee.hiredDate;
+
+    employee.history.forEach(function (evaluation) {
+        if (evaluation.role !== role) {
+            table += `
+            <tr>
+                <td>${role}</td>
+                <td>${format(since)}</td>
+                <td>${format(evaluation.date)}</td>
+            </tr>
+            `;
+            role = evaluation.role;
+            since = evaluation.date;
+        }
+    });
+
+    table += `
+    <tr>
+        <td>${role}</td>
+        <td>${format(since)}</td>
+        <td>Ao momento</td>
+    </tr>
+    </tbody>
+    `
+
+    return table;
 }
