@@ -83,7 +83,7 @@ var loadEmployeeHistoryPage = function (id) {
     </div>
     <footer class="bg-white sticky-footer">
         <div class="container my-auto">
-            <div class="text-center my-auto copyright"><span>Copyright © Brand 2022</span></div>
+            <div class="text-center my-auto copyright"><span>IPS - Gestão de Recursos Humanos</span></div>
         </div>
     </footer>
 </div>

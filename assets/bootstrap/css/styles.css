@@ -6,6 +6,34 @@
   cursor: pointer;
 }
 
+.employees {
+
+  width: 100%;
+  max-width: 100%;
+  padding-right: calc(var(--bs-gutter-x) * .5);
+  padding-left: calc(var(--bs-gutter-x) * .5);
+  margin-top: var(--bs-gutter-y);
+  text-align: center;
+  display: flex;
+
+}
+
+.cardE {
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+  transition: 0.3s;
+  width: 30%;
+  margin-right: 2%;
+  margin-left: 2%;
+  margin-bottom: 5%;
+}
+
+.cardE:hover {
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+}
+
+.containerE {
+  padding: 2px 16px;
+}
 /* On mouse-over */
 /* .button-text:hover {
   background: #eee;
